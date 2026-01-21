@@ -1,9 +1,10 @@
-// backend.js
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
 
+app.use(cors());
 app.use(express.json());
 
 const users = {
@@ -26,7 +27,7 @@ const users = {
     {
       id: "yat999",
       name: "Dee",
-      job: "Aspring actress"
+      job: "Aspiring actress"
     },
     {
       id: "zap555",
@@ -49,17 +50,13 @@ app.get("/", (req, res) => {
 app.get("/users", (req, res) => {
   const name = req.query.name;
   const job = req.query.job;
-
   let filtered = users["users_list"];
-
   if (name !== undefined) {
     filtered = filtered.filter(user => user.name === name);
   }
-
   if (job !== undefined) {
     filtered = filtered.filter(user => user.job === job);
   }
-
   res.send({ users_list: filtered });
 });
 
@@ -67,7 +64,7 @@ const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
 app.get("/users/:id", (req, res) => {
-  const id = req.params["id"]; //or req.params.id
+  const id = req.params["id"];
   let result = findUserById(id);
   if (result === undefined) {
     res.status(404).send("Resource not found.");
@@ -77,20 +74,19 @@ app.get("/users/:id", (req, res) => {
 });
 
 const deleteUserById = (id) => {
-  const index = users["users_list"].findIndex(user => user.id === id);  
+  const index = users["users_list"].findIndex(user => user.id === id);
   if (index !== -1) {
     users["users_list"].splice(index, 1);
-    return true;  
+    return true;
   }
-  return false; 
+  return false;
 };
 
 app.delete("/users/:id", (req, res) => {
   const id = req.params.id;
   const deleted = deleteUserById(id);
-
   if (deleted) {
-    res.status(204).send();  
+    res.status(204).send();
   } else {
     res.status(404).send("Resource not found.");
   }
@@ -101,10 +97,13 @@ const addUser = (user) => {
   return user;
 };
 
+const generateId = () => Math.random().toString(36).substring(2, 9);
+
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
+  userToAdd.id = generateId();
   addUser(userToAdd);
-  res.send();
+  res.status(201).json(userToAdd);
 });
 
 app.listen(port, () => {
