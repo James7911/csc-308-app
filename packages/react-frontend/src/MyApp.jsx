@@ -11,9 +11,9 @@ function MyApp() {
     })
       .then((res) => {
         if (res.status === 204 || res.status === 200) {
-          setCharacters(characters.filter((character) => character.id !== id));
+          setCharacters(characters.filter((character) => character._id !== id));
         } else if (res.status === 404) {
-          setCharacters(characters.filter((character) => character.id !== id));
+          setCharacters(characters.filter((character) => character._id !== id));
         } else {
           console.log("Delete failed:", res.status);
         }
